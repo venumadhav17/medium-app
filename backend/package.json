@@ -1,0 +1,23 @@
+{
+  "name": "medium-app",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+  },
+  "dependencies": {
+    "@kvm17/mediumapp-common": "^1.0.1",
+    "@prisma/client": "^7.2.0",
+    "@prisma/extension-accelerate": "^3.0.1",
+    "dotenv": "^17.2.3",
+    "hono": "^4.10.7",
+    "init": "^0.1.2",
+    "npx": "^10.2.2",
+    "prisma": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "wrangler": "^4.4.0"
+  }
+}

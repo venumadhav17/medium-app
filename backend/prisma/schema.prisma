@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id    Int     @id @default(autoincrement())
+  name  String? // not required
+  username String  @unique
+  password String
+  posts    Blog[]
+}
+
+model Blog {
+  id       Int     @id @default(autoincrement())
+  authorId Int
+  title    String
+  content  String
+  author   User    @relation(fields: [authorId], references: [id]) 
+  published Boolean @default(false)
+}
+
+// constraints -> If i put 3 entries in the users table with 1,2,3 ids and if i try to add a post and give the authorid of 100 for a user that doesn't exist my db will throw an error. 
+
+// generate used to generate ts files
