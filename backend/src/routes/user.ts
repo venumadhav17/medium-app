@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-
-import { withAccelerate } from "@prisma/extension-accelerate";
 import { sign } from "hono/jwt";
-import { PrismaClient } from "../generated/prisma/edge";
 import { signinInput, signupInput } from "@kvm17/mediumapp-common";
+// import { getPrisma } from "../db";
+import { PrismaClient } from "../generated/prisma/edge";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
 export const userRouter = new Hono<{
   Bindings: {
@@ -14,7 +14,9 @@ export const userRouter = new Hono<{
 
 userRouter.post("/signup", async (c) => {
   const body = await c.req.json();
+  console.log(body);
   const { success } = signupInput.safeParse(body);
+  console.log(success);
   if (!success) {
     c.status(411);
     return c.json({
@@ -24,6 +26,7 @@ userRouter.post("/signup", async (c) => {
   const prisma = new PrismaClient({
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
+  // const prisma = getPrisma(c.env.PRISMA_DATABASE_URL);
 
   try {
     // duplicate email rectify if user already present using prisma.user.find
@@ -61,6 +64,8 @@ userRouter.post("/signin", async (c) => {
   const prisma = new PrismaClient({
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
+
+  // const prisma = getPrisma(c.env.PRISMA_DATABASE_URL);
 
   try {
     // duplicate email rectify if user already present using prisma.user.find

@@ -3,6 +3,7 @@ import { PrismaClient } from "../generated/prisma/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { verify } from "hono/jwt";
 import { createBlogInput } from "@kvm17/mediumapp-common";
+// import { getPrisma } from "../db";
 
 export const blogRouter = new Hono<{
   Bindings: {
@@ -51,6 +52,7 @@ blogRouter.post("/", async (c) => {
   const prisma = new PrismaClient({
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
+  // const prisma = getPrisma(c.env.PRISMA_DATABASE_URL);
 
   const blog = await prisma.blog.create({
     data: {
@@ -76,6 +78,7 @@ blogRouter.put("/", async (c) => {
   const prisma = new PrismaClient({
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
+  // const prisma = getPrisma(c.env.PRISMA_DATABASE_URL);
 
   const blog = await prisma.blog.update({
     where: {
@@ -98,7 +101,18 @@ blogRouter.get("/bulk", async (c) => {
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
 
-  const blogs = await prisma.blog.findMany();
+  const blogs = await prisma.blog.findMany({
+    select: {
+      content: true,
+      title: true,
+      id: true,
+      author: {
+        select: {
+          name: true
+        }
+      }
+    }
+  });
   return c.json({ blogs });
 });
 
@@ -107,11 +121,22 @@ blogRouter.get("/:id", async (c) => {
   const prisma = new PrismaClient({
     accelerateUrl: c.env.PRISMA_DATABASE_URL
   }).$extends(withAccelerate());
+  // const prisma = getPrisma(c.env.PRISMA_DATABASE_URL);
 
   try {
     const blog = await prisma.blog.findFirst({
       where: {
         id: Number(id)
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        author: {
+          select: {
+            name: true
+          }
+        }
       }
     });
     return c.json({
